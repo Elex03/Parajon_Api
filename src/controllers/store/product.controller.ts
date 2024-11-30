@@ -174,6 +174,8 @@ export const updateProductById = async (req: Request, res: Response) => {
 
 export const deleteProductById = async (req: Request, res: Response) => {
   let { id } = req.params;console.log(id);
+
+  
   const imagen = await prismaclient.imagenes.findFirst({
     where: { id_producto: Number(id) },
   });
