@@ -1,0 +1,222 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model talla {
+  id_talla    Int             @id @default(autoincrement())
+  numero      Int
+  producTalla productoTalla[]
+}
+
+model productoTalla {
+  id_producTalla Int       @id @default(autoincrement())
+  id_talla       Int
+  cantidad       Int
+  id_producto    Int
+  producto       productos @relation(fields: [id_producto], references: [id_producto])
+  talla          talla     @relation(fields: [id_talla], references: [id_talla])
+}
+
+model administradores {
+  id_admin           Int                 @id @default(autoincrement())
+  cedula             String              @db.VarChar(17)
+  nombre             String              @db.VarChar(50)
+  apellido           String              @db.VarChar(50)
+  fecha_nacimiento   DateTime?           @db.Date
+  id_proveedor       Int?
+  id_pago            Int?
+  id_trabajador      Int?
+  id_donacion        Int?
+  id_compramateria   Int?
+  compramateriaprima compramateriaprima? @relation(fields: [id_compramateria], references: [id_compramateria], onDelete: NoAction, onUpdate: NoAction)
+  donaciones         donaciones?         @relation(fields: [id_donacion], references: [id_donacion], onDelete: NoAction, onUpdate: NoAction)
+  pagos              pagos?              @relation(fields: [id_pago], references: [id_pago], onDelete: NoAction, onUpdate: NoAction)
+  proveedores        proveedores?        @relation(fields: [id_proveedor], references: [id_proveedor], onDelete: NoAction, onUpdate: NoAction)
+  trabajadores       trabajadores?       @relation(fields: [id_trabajador], references: [id_trabajador], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model clientes {
+  id_cliente Int       @id @default(autoincrement())
+  nombre     String    @db.VarChar(50)
+  apellido   String    @db.VarChar(50)
+  telefono   String?   @db.VarChar(8)
+  direccion  String?   @db.VarChar(100)
+  cedula     String?   @unique @db.VarChar(20)
+  factura    factura[]
+}
+
+model compramateriaprima {
+  id_compramateria  Int               @id @default(autoincrement())
+  fecha_importacion DateTime?         @db.Date
+  id_materiaprima   Int?
+  cantidad          Int?
+  total             Decimal?          @db.Decimal(10, 2)
+  administradores   administradores[]
+  materiaprima      materiaprima?     @relation(fields: [id_materiaprima], references: [id_materiaprima], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model compras {
+  id_compra     Int             @id @default(autoincrement())
+  id_producto   Int?
+  id_trabajador Int?
+  fecha_compra  DateTime?       @db.Date
+  productos     productos?      @relation(fields: [id_producto], references: [id_producto], onDelete: NoAction, onUpdate: NoAction)
+  trabajadores  trabajadores?   @relation(fields: [id_trabajador], references: [id_trabajador], onDelete: NoAction, onUpdate: NoAction)
+  exportaciones exportaciones[]
+  factura       factura[]
+  ordenencargo  ordenencargo[]
+}
+
+model donaciones {
+  id_donacion     Int               @id @default(autoincrement())
+  id_producto     Int?
+  destino         String?           @db.VarChar(100)
+  cantidad        Int?
+  administradores administradores[]
+  productos       productos?        @relation(fields: [id_producto], references: [id_producto], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model exportaciones {
+  id_exportacion  Int           @id @default(autoincrement())
+  id_compra       Int?
+  cantidad_zapato Int?
+  id_metodopago   Int?
+  id_encargo      Int?
+  fecha_entrega   DateTime?     @db.Date
+  fecha_emision   DateTime?     @db.Date
+  pais            String        @db.VarChar(20)
+  compras         compras?      @relation(fields: [id_compra], references: [id_compra], onDelete: NoAction, onUpdate: NoAction)
+  ordenencargo    ordenencargo? @relation(fields: [id_encargo], references: [id_encargo], onDelete: NoAction, onUpdate: NoAction)
+  metodopago      metodopago?   @relation(fields: [id_metodopago], references: [id_metodopago], onDelete: NoAction, onUpdate: NoAction)
+  factura         factura[]
+}
+
+model factura {
+  id_factura        Int            @id @default(autoincrement())
+  id_exportacion    Int?
+  id_cliente        Int?
+  id_encargo        Int?
+  id_compra         Int?
+  id_metodopago     Int?
+  id_trabajador     Int?
+  resumen_productos String?        @db.VarChar(255)
+  total             Decimal?       @db.Decimal(10, 2)
+  fecha_emision     DateTime?      @db.Date
+  precio            Decimal?       @db.Decimal(10, 2)
+  cantidad          Int?
+  clientes          clientes?      @relation(fields: [id_cliente], references: [id_cliente], onDelete: NoAction, onUpdate: NoAction)
+  compras           compras?       @relation(fields: [id_compra], references: [id_compra], onDelete: NoAction, onUpdate: NoAction)
+  ordenencargo      ordenencargo?  @relation(fields: [id_encargo], references: [id_encargo], onDelete: NoAction, onUpdate: NoAction)
+  exportaciones     exportaciones? @relation(fields: [id_exportacion], references: [id_exportacion], onDelete: NoAction, onUpdate: NoAction)
+  metodopago        metodopago?    @relation(fields: [id_metodopago], references: [id_metodopago], onDelete: NoAction, onUpdate: NoAction)
+  trabajadores      trabajadores?  @relation(fields: [id_trabajador], references: [id_trabajador], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model materiaprima {
+  id_materiaprima    Int                  @id @default(autoincrement())
+  id_proveedor       Int?
+  material           String               @db.VarChar(50)
+  cantidad_material  Int?
+  precio             Decimal?             @db.Decimal(10, 2)
+  estado_de_material String?              @db.VarChar(20)
+  compramateriaprima compramateriaprima[]
+  proveedores        proveedores?         @relation(fields: [id_proveedor], references: [id_proveedor], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model metodopago {
+  id_metodopago Int             @id @default(autoincrement())
+  metodo        String          @db.VarChar(20)
+  exportaciones exportaciones[]
+  factura       factura[]
+}
+
+model ordenencargo {
+  id_encargo      Int             @id @default(autoincrement())
+  id_compra       Int?
+  material_zapato String?         @db.VarChar(50)
+  estado_pago     String?         @db.VarChar(20)
+  cantidad        Int?
+  color           String?         @db.VarChar(20)
+  talla           String?         @db.VarChar(10)
+  exportaciones   exportaciones[]
+  factura         factura[]
+  compras         compras?        @relation(fields: [id_compra], references: [id_compra], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model pagos {
+  id_pago         Int               @id @default(autoincrement())
+  monto           Decimal           @db.Decimal(10, 2)
+  area_pago       String?           @db.VarChar(100)
+  administradores administradores[]
+}
+
+model produccion {
+  id_produccion       Int           @id @default(autoincrement())
+  id_producto         Int?
+  id_trabajador       Int?
+  fecha_inicio        DateTime?     @db.Date
+  fecha_fin           DateTime?     @db.Date
+  cantidad_producida  Int?
+  duracion_produccion Int?          @default(0)
+  productos           productos?    @relation(fields: [id_producto], references: [id_producto], onDelete: NoAction, onUpdate: NoAction)
+  trabajadores        trabajadores? @relation(fields: [id_trabajador], references: [id_trabajador], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model productos {
+  id_producto                 Int             @id @default(autoincrement())
+  material                    material
+  categoria                   String?         @db.VarChar(50)
+  precio_venta                Int
+  precio_produccion           Int
+  fecha_ingreso_de_produccion DateTime?       @db.Date
+  estado                      Boolean         @default(true)
+  sexo                        String?         @db.VarChar(20)
+  rango_edad                  String?         @db.VarChar(40)
+  estilo                      String          @db.VarChar(50)
+  compras                     compras[]
+  donaciones                  donaciones[]
+  imagenes                    imagenes[]
+  produccion                  produccion[]
+  productoTalla               productoTalla[]
+}
+
+model imagenes {
+  id_imagen   Int       @id @default(autoincrement())
+  id_producto Int
+  imagenPath  String
+  producto    productos @relation(fields: [id_producto], references: [id_producto])
+}
+
+model proveedores {
+  id_proveedor    Int               @id @default(autoincrement())
+  nombre          String            @db.VarChar(50)
+  direccion       String?           @db.VarChar(50)
+  telefono        String?           @db.VarChar(8)
+  tipo_producto   String?           @db.VarChar(50)
+  administradores administradores[]
+  materiaprima    materiaprima[]
+}
+
+model trabajadores {
+  id_trabajador   Int               @id @default(autoincrement())
+  nombre          String            @db.VarChar(50)
+  apellido        String            @db.VarChar(50)
+  cedula          String            @db.VarChar(17)
+  area_trabajo    String            @db.VarChar(20)
+  administradores administradores[]
+  compras         compras[]
+  factura         factura[]
+  produccion      produccion[]
+}
+
+enum material {
+  CUERINA
+  TELA
+  CUERO
+  GAMUSA
+}

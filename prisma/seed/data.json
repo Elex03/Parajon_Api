@@ -1,0 +1,29 @@
+{
+    "material": "CUERO",
+    "rango_edad": "Adultos",
+    "categoria_estilo": "Casual",
+    "productoTalla": [
+      {
+        "talla": {
+          "numero": 38
+        },
+        "cantidad": 100
+      },
+      {
+        "talla": {
+          "numero": 40
+        },
+        "cantidad": 150
+      },
+      {
+        "talla": {
+          "numero": 42
+        },
+        "cantidad": 120
+      }
+    ],
+    "precio_final": 5000,
+    "color": "Marrón",
+    "fecha_ingreso_de_produccion": "2024-11-21T00:00:00.000Z"
+  }
+  
