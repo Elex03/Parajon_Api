@@ -4,7 +4,7 @@ import { prismaclient } from "../../config";
 
 export const getBills = async (_req: Request, res: Response) => {
 
-    const billData = await prismaclient.factura.findMany()
+    const billData = await prismaclient.clientes.findMany()
 
     res.send(billData);
 }

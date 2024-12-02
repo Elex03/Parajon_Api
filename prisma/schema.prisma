@@ -62,13 +62,13 @@ model compramateriaprima {
 
 model compras {
   id_compra     Int             @id @default(autoincrement())
-  id_producto   Int?
-  id_trabajador Int?
+  id_producto   Int
+  id_factura Int 
   fecha_compra  DateTime?       @db.Date
   productos     productos?      @relation(fields: [id_producto], references: [id_producto], onDelete: NoAction, onUpdate: NoAction)
-  trabajadores  trabajadores?   @relation(fields: [id_trabajador], references: [id_trabajador], onDelete: NoAction, onUpdate: NoAction)
+  
+    factura  factura?   @relation(fields: [id_factura], references: [id_factura], onDelete: NoAction, onUpdate: NoAction)
   exportaciones exportaciones[]
-  factura       factura[]
   ordenencargo  ordenencargo[]
 }
 
@@ -101,7 +101,6 @@ model factura {
   id_exportacion    Int?
   id_cliente        Int?
   id_encargo        Int?
-  id_compra         Int?
   id_metodopago     Int?
   id_trabajador     Int?
   resumen_productos String?        @db.VarChar(255)
@@ -109,8 +108,8 @@ model factura {
   fecha_emision     DateTime?      @db.Date
   precio            Decimal?       @db.Decimal(10, 2)
   cantidad          Int?
+  compra  compras[]
   clientes          clientes?      @relation(fields: [id_cliente], references: [id_cliente], onDelete: NoAction, onUpdate: NoAction)
-  compras           compras?       @relation(fields: [id_compra], references: [id_compra], onDelete: NoAction, onUpdate: NoAction)
   ordenencargo      ordenencargo?  @relation(fields: [id_encargo], references: [id_encargo], onDelete: NoAction, onUpdate: NoAction)
   exportaciones     exportaciones? @relation(fields: [id_exportacion], references: [id_exportacion], onDelete: NoAction, onUpdate: NoAction)
   metodopago        metodopago?    @relation(fields: [id_metodopago], references: [id_metodopago], onDelete: NoAction, onUpdate: NoAction)
@@ -209,7 +208,6 @@ model trabajadores {
   cedula          String            @db.VarChar(17)
   area_trabajo    String            @db.VarChar(20)
   administradores administradores[]
-  compras         compras[]
   factura         factura[]
   produccion      produccion[]
 }
