@@ -63,11 +63,11 @@ model compramateriaprima {
 model compras {
   id_compra     Int             @id @default(autoincrement())
   id_producto   Int
-  id_factura Int 
-  fecha_compra  DateTime?       @db.Date
+  id_factura    Int 
+  cantidad      Int
+  subtotal      Decimal         @db.Decimal(10,2)
   productos     productos?      @relation(fields: [id_producto], references: [id_producto], onDelete: NoAction, onUpdate: NoAction)
-  
-    factura  factura?   @relation(fields: [id_factura], references: [id_factura], onDelete: NoAction, onUpdate: NoAction)
+  factura  factura?   @relation(fields: [id_factura], references: [id_factura], onDelete: NoAction, onUpdate: NoAction)
   exportaciones exportaciones[]
   ordenencargo  ordenencargo[]
 }
@@ -104,10 +104,8 @@ model factura {
   id_metodopago     Int?
   id_trabajador     Int?
   resumen_productos String?        @db.VarChar(255)
-  total             Decimal?       @db.Decimal(10, 2)
-  fecha_emision     DateTime?      @db.Date
-  precio            Decimal?       @db.Decimal(10, 2)
-  cantidad          Int?
+  total             Decimal       @db.Decimal(10, 2)
+  fecha     DateTime     @db.Date
   compra  compras[]
   clientes          clientes?      @relation(fields: [id_cliente], references: [id_cliente], onDelete: NoAction, onUpdate: NoAction)
   ordenencargo      ordenencargo?  @relation(fields: [id_encargo], references: [id_encargo], onDelete: NoAction, onUpdate: NoAction)
@@ -115,6 +113,8 @@ model factura {
   metodopago        metodopago?    @relation(fields: [id_metodopago], references: [id_metodopago], onDelete: NoAction, onUpdate: NoAction)
   trabajadores      trabajadores?  @relation(fields: [id_trabajador], references: [id_trabajador], onDelete: NoAction, onUpdate: NoAction)
 }
+
+
 
 model materiaprima {
   id_materiaprima    Int                  @id @default(autoincrement())

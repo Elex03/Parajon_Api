@@ -61,8 +61,8 @@ CREATE TABLE "compramateriaprima" (
 -- CreateTable
 CREATE TABLE "compras" (
     "id_compra" SERIAL NOT NULL,
-    "id_producto" INTEGER,
-    "id_trabajador" INTEGER,
+    "id_producto" INTEGER NOT NULL,
+    "id_factura" INTEGER NOT NULL,
     "fecha_compra" DATE,
 
     CONSTRAINT "compras_pkey" PRIMARY KEY ("id_compra")
@@ -98,14 +98,11 @@ CREATE TABLE "factura" (
     "id_exportacion" INTEGER,
     "id_cliente" INTEGER,
     "id_encargo" INTEGER,
-    "id_compra" INTEGER,
     "id_metodopago" INTEGER,
     "id_trabajador" INTEGER,
     "resumen_productos" VARCHAR(255),
-    "total" DECIMAL(10,2),
-    "fecha_emision" DATE,
-    "precio" DECIMAL(10,2),
-    "cantidad" INTEGER,
+    "total" DECIMAL(10,2) NOT NULL,
+    "fecha" DATE NOT NULL,
 
     CONSTRAINT "factura_pkey" PRIMARY KEY ("id_factura")
 );
@@ -168,12 +165,12 @@ CREATE TABLE "produccion" (
 -- CreateTable
 CREATE TABLE "productos" (
     "id_producto" SERIAL NOT NULL,
-    "codigo" VARCHAR(100) NOT NULL,
     "material" "material" NOT NULL,
     "categoria" VARCHAR(50),
     "precio_venta" INTEGER NOT NULL,
     "precio_produccion" INTEGER NOT NULL,
     "fecha_ingreso_de_produccion" DATE,
+    "estado" BOOLEAN NOT NULL DEFAULT true,
     "sexo" VARCHAR(20),
     "rango_edad" VARCHAR(40),
     "estilo" VARCHAR(50) NOT NULL,
@@ -243,7 +240,7 @@ ALTER TABLE "compramateriaprima" ADD CONSTRAINT "compramateriaprima_id_materiapr
 ALTER TABLE "compras" ADD CONSTRAINT "compras_id_producto_fkey" FOREIGN KEY ("id_producto") REFERENCES "productos"("id_producto") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "compras" ADD CONSTRAINT "compras_id_trabajador_fkey" FOREIGN KEY ("id_trabajador") REFERENCES "trabajadores"("id_trabajador") ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE "compras" ADD CONSTRAINT "compras_id_factura_fkey" FOREIGN KEY ("id_factura") REFERENCES "factura"("id_factura") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
 ALTER TABLE "donaciones" ADD CONSTRAINT "donaciones_id_producto_fkey" FOREIGN KEY ("id_producto") REFERENCES "productos"("id_producto") ON DELETE NO ACTION ON UPDATE NO ACTION;
@@ -259,9 +256,6 @@ ALTER TABLE "exportaciones" ADD CONSTRAINT "exportaciones_id_metodopago_fkey" FO
 
 -- AddForeignKey
 ALTER TABLE "factura" ADD CONSTRAINT "factura_id_cliente_fkey" FOREIGN KEY ("id_cliente") REFERENCES "clientes"("id_cliente") ON DELETE NO ACTION ON UPDATE NO ACTION;
-
--- AddForeignKey
-ALTER TABLE "factura" ADD CONSTRAINT "factura_id_compra_fkey" FOREIGN KEY ("id_compra") REFERENCES "compras"("id_compra") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
 ALTER TABLE "factura" ADD CONSTRAINT "factura_id_encargo_fkey" FOREIGN KEY ("id_encargo") REFERENCES "ordenencargo"("id_encargo") ON DELETE NO ACTION ON UPDATE NO ACTION;
