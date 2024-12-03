@@ -15,6 +15,14 @@ interface propsBill {
   compras: compraI[]
 }
 
+interface stockProduct {
+  id_productTalla: number;
+  id_talla: number;
+  cantidad: number;
+  id_producto: number;
+}
+
+
 export const getFacturaConCompras = async (req: Request, res: Response) => {
   try {
     const { id_factura } = req.params; // Suponiendo que pasas el ID de la factura como parámetro en la URL
@@ -60,15 +68,12 @@ export const getBillAndDetails = async (_req: Request, res: Response) => {
 
   const parseData = data.map((data) => ({
     id_factura: data.id_factura,
-    total: Number(data.total),
+    total: data.compra.reduce((sum, compra) => sum + (compra.productos?.precio_venta || 0) * compra.cantidad, 0),
     productos: data.compra.map((compra) => ({
       precio_venta: compra.productos?.precio_venta,
       cantidad: compra.cantidad,
     })),
   }));
-
-
-
   res.status(200).send(parseData);
 };
 
@@ -84,13 +89,28 @@ export const createNewBill = async (req: Request, res: Response) => {
         id_trabajador: id_trabajador 
       }
     });
-
-
     compras.map((item)=> {item.id_factura = billData.id_factura})
-
     await prismaclient.compras.createMany({
       data: compras
     })
+
+      // Actualizar el stock
+      await prismaclient.productoTalla.update({
+        where: {
+          id_producto_id_talla: {
+            id_producto: item.id_producto,
+            id_talla: item.id_talla,
+          },
+        },
+        data: {
+          cantidad: productoTalla.cantidad - item.cantidad,
+        },
+      });
+    }
+    
+
+
+
     res.status(200).send(`Factura ${billData.id_factura} creada`)
   } catch (error) {
     console.error("Error al crear la factura con compras:", error);
