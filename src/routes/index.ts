@@ -8,18 +8,21 @@ import appClient from "./store/client";
 import workerRoute from "./store/worker";
 import appExport from "./store/exportaciones";
 import materialRouter from "./store/buyMaterial";
+import appPago from "./store/pagos";
+import appDonaciones from "./store/product";
 
 const appRouter = Router();
 
 appRouter.use('/auth', appAuth);
 appRouter.use('/store', appStore);
 appRouter.use('/bill', billRoute);
-appRouter.use('/talla', tallaRoute)
-appRouter.use('/proveedores',appPro)
-appRouter.use('/client', appClient)
+appRouter.use('/talla', tallaRoute);
+appRouter.use('/proveedores',appPro);
+appRouter.use('/client', appClient);
 appRouter.use('/worker',workerRoute);
 appRouter.use('/exportaciones', appExport);
-appRouter.use('/material', materialRouter)
-
+appRouter.use('/material', materialRouter);
+appRouter.use('/pago', appPago);
+appRouter.use('/donaciones', appDonaciones);
 
 export default appRouter
