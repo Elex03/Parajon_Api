@@ -91,6 +91,7 @@ export const createProduct = async (req: Request, res: Response) => {
                 cantidad: talla.cantidad,
               },
             });
+            console.log("ProductoTalla creada: ", productoTalla);
           })
         );
 

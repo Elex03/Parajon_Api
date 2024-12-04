@@ -74,7 +74,6 @@ export const getBillAndDetails = async (_req: Request, res: Response) => {
   res.status(200).send(parseData);
 };
 
-
 export const getBillById = async (req: Request, res: Response) => {
   const idBill = Number(req.params.id);
   const billDataById = await prismaclient.factura.findUnique({
@@ -82,7 +81,6 @@ export const getBillById = async (req: Request, res: Response) => {
       id_factura: idBill,
     },
   });
-
   res.send(billDataById);
 };
 
@@ -108,37 +106,41 @@ export const createNewBill = async (req: Request, res: Response) => {
       data: compras,
     });
 
-    // Aquí cambiamos la forma en que manejamos la lógica asíncrona de la cantidad
-    for (let comprasItem of compras) {
-      const cantidadOld = await prismaclient.productoTalla.findFirst({
-        where: {
-          id_producto: comprasItem.id_producto,
-        },
-        select: {
-          cantidad: true,
-        },
-      });
 
-      if (cantidadOld && cantidadOld.cantidad >= comprasItem.cantidad) {
-        // Actualizamos la cantidad de stock solo si hay suficiente
-        await prismaclient.productoTalla.updateMany({
-          where: {
-            id_producto: comprasItem.id_producto,
-          },
-          data: {
-            cantidad: cantidadOld.cantidad - comprasItem.cantidad,
-          },
+    await Promise.all(
+      compras.map(async (compra) => {
+        // Buscar el producto y su cantidad en inventario
+        const productTalla = await prismaclient.productoTalla.findFirst({
+          where: { id_producto: compra.id_producto },
         });
-      } else {
-        // Si no hay suficiente stock, enviamos el error y salimos de la función
-        res.status(400).json({ Error: 'La cantidad a comprar es mayor a la cantidad en stock' });
-      }
-    }
+
+        // Verificar si el producto existe en inventario
+        if (!productTalla) {
+          throw new Error(
+            `El producto con ID ${compra.id_producto} no tiene inventario registrado.`
+          );
+        }
+
+        // Verificar si hay stock suficiente
+        if (productTalla.cantidad < compra.cantidad) {
+          throw new Error(
+            `Cantidad insuficiente para el producto con ID ${compra.id_producto}.`
+          );
+        }
+
+        // Reducir el stock
+        await prismaclient.productoTalla.update({
+          where: { id_producTalla: productTalla.id_producTalla },
+          data: { cantidad: productTalla.cantidad - compra.cantidad },
+        });
+      })
+    );
 
     // Si todo fue exitoso, enviamos la respuesta de éxito
     res.status(200).send(`Factura ${billData.id_factura} creada`);
 
-  } catch (error) {
+  } 
+  catch (error) {
     console.error("Error al crear la factura con compras:", error);
     res.status(500).json({
       error: "Error interno del servidor al crear la factura con compras.",

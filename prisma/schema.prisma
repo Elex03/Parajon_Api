@@ -20,6 +20,8 @@ model productoTalla {
   id_producto    Int
   producto       productos @relation(fields: [id_producto], references: [id_producto])
   talla          talla     @relation(fields: [id_talla], references: [id_talla])
+  @@unique([id_producto, id_talla]) 
+
 }
 
 model administradores {
